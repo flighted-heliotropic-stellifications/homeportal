@@ -16,7 +16,6 @@ import scala.sys.process._
 import scala.util.Success
 import scala.util.Failure
 import scala.util.Try
-import scala.jdk.CollectionConverters._
 
 class HomePortalRoutes(config: Config) {
   private val htmlDir = config.getString("app.html-dir")
@@ -34,10 +33,9 @@ class HomePortalRoutes(config: Config) {
     import dsl._
     HttpRoutes.of[IO] {
       case request @ GET -> Root / "print" =>
-        val printPath = fs2.io.file.Path(s"$htmlDir/print.html")
         StaticFile
-        .fromPath(printPath, Some(request))
-          .getOrElseF(NotFound(this.getClass.getClassLoader.getResources("").asScala.mkString(" SPACE ")))
+        .fromResource(s"$htmlDir/print.html", Some(request))
+          .getOrElseF(NotFound())
       case request @ POST -> Root / "print" =>
         EntityDecoder.mixedMultipartResource[IO]().use(decoder =>
           request.decodeWith(decoder, strict = true){ multipart =>
@@ -54,7 +52,7 @@ class HomePortalRoutes(config: Config) {
               val cmd = s"lpr $pathString"
               val output = cmd.!!
               if (output.isEmpty()) {
-                val printSuccessTemplate: String = Source.fromFile(s"$htmlDir/print-success.html").mkString
+                val printSuccessTemplate: String = Source.fromResource(s"$htmlDir/print-success.html").mkString
                 val finalPrintSuccess = applySubstitutions(printSuccessTemplate)            
                 Ok(finalPrintSuccess).map(_.withContentType(`Content-Type`(MediaType.text.html)))
               } else {
@@ -74,7 +72,7 @@ class HomePortalRoutes(config: Config) {
   def indexRoutes: HttpRoutes[IO] = {
     val dsl = new Http4sDsl[IO]{}
     import dsl._
-    val indexTemplate: String = Source.fromFile(s"$htmlDir/index.html").mkString
+    val indexTemplate: String = Source.fromResource(s"$htmlDir/index.html").mkString
     val finalIndex = applySubstitutions(indexTemplate)
 
     HttpRoutes.of[IO] {

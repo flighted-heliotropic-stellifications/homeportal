@@ -24,7 +24,7 @@ object HomePortalServer {
     val httpApp = (
         homePortalRoutes.indexRoutes <+>
         homePortalRoutes.printRoutes <+>
-        fileService(FileService.Config(cssDir))
+        resourceServiceBuilder(s"/$cssDir").toRoutes
       ).orNotFound
 
     val finalHttpApp = Logger.httpApp(true, true)(httpApp)
