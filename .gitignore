@@ -1,0 +1,10 @@
+.bloop
+.bsp
+.metals
+.vscode
+project/target
+project/project
+project/metals.sbt
+target
+src/main/resources/ports.conf
+src/main/resources/output

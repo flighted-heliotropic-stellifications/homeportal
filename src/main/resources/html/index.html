@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="index.css">
+  <meta charset="utf-8">
+  <title>New Page</title>
+  <meta name="description" content="Description of the page" />
+</head>
+<body>
+  <h1>Welcome</h1>
+  <h2>Media</h2>
+  <table>
+    <tr>
+      <td><a href="http://localhost:{{CALIBRE_WEB_PORT}}">Calibre Web (browse books)</a></td>
+      <td><a href="http://localhost:{{CALIBRE_PORT}}">Calibre (upload books)</a></td>
+      <td><a href="http://localhost:{{JELLYFIN_PORT}}">Jellyfin Media</a></td>
+    </tr>
+  </table>
+  <h2>Utilities</h2>
+    <table>
+      <tr>
+        <td><a href="http://localhost:{{SERVICE_PORT}}/print">Print</a></td>
+      </tr>
+    </table>
+</body>
+</html>
