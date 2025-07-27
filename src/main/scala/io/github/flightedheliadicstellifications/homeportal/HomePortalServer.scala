@@ -19,9 +19,11 @@ object HomePortalServer {
 
     val cssDir = config.getString("app.css-dir")
 
+    val homePortalRoutes = new HomePortalRoutes(config)
+
     val httpApp = (
-        HomePortalRoutes.indexRoutes(config) <+>
-        HomePortalRoutes.printRoutes(config) <+>
+        homePortalRoutes.indexRoutes <+>
+        homePortalRoutes.printRoutes <+>
         fileService(FileService.Config(cssDir))
       ).orNotFound
 

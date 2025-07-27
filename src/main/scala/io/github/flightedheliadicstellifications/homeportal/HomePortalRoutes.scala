@@ -18,11 +18,18 @@ import scala.util.Failure
 import scala.util.Try
 import scala.jdk.CollectionConverters._
 
-object HomePortalRoutes {
+class HomePortalRoutes(config: Config) {
+  private val htmlDir = config.getString("app.html-dir")
+  private val outputDir = config.getString("app.print.output-dir")
+  private val calibrePort = config.getString("app.ports.calibre")
+  private val calibreWebPort = config.getString("app.ports.calibre-web")
+  private val jellyfinPort = config.getString("app.ports.jellyfin")
+  private val homeserverPort = config.getString("app.ports.homeportal")
+  private val homeserverHost = config.getString("app.hosts.homeportal")
 
-  def printRoutes(config: Config): HttpRoutes[IO] = {
-    val htmlDir = config.getString("app.html-dir")
-    val outputDir = config.getString("app.print.output-dir")
+
+  def printRoutes: HttpRoutes[IO] = {
+    
     val dsl = new Http4sDsl[IO]{}
     import dsl._
     HttpRoutes.of[IO] {
@@ -47,7 +54,9 @@ object HomePortalRoutes {
               val cmd = s"lpr $pathString"
               val output = cmd.!!
               if (output.isEmpty()) {
-                Ok()
+                val printSuccessTemplate: String = Source.fromFile(s"$htmlDir/print-success.html").mkString
+                val finalPrintSuccess = applySubstitutions(printSuccessTemplate)            
+                Ok(finalPrintSuccess).map(_.withContentType(`Content-Type`(MediaType.text.html)))
               } else {
                 InternalServerError(output)
               }
@@ -62,29 +71,25 @@ object HomePortalRoutes {
   }
 
 
-  def indexRoutes(config: Config): HttpRoutes[IO] = {
+  def indexRoutes: HttpRoutes[IO] = {
     val dsl = new Http4sDsl[IO]{}
     import dsl._
-    val htmlDir = config.getString("app.html-dir")
     val indexTemplate: String = Source.fromFile(s"$htmlDir/index.html").mkString
-
-    val calibrePort = config.getString("app.ports.calibre")
-    val calibreWebPort = config.getString("app.ports.calibre-web")
-    val jellyfinPort = config.getString("app.ports.jellyfin")
-    val homeserverPort = config.getString("app.ports.homeportal")
-    val homeserverHost = config.getString("app.hosts.homeportal")
-
-    val finalIndex = indexTemplate
-      .replaceAll("""\{\{CALIBRE_PORT\}\}""", calibrePort)
-      .replaceAll("""\{\{CALIBRE_WEB_PORT\}\}""", calibreWebPort)
-      .replaceAll("""\{\{JELLYFIN_PORT\}\}""", jellyfinPort)
-      .replaceAll("""\{\{SERVICE_PORT\}\}""", homeserverPort)
-      .replaceAll("""\{\{HOST\}\}""", homeserverHost)
+    val finalIndex = applySubstitutions(indexTemplate)
 
     HttpRoutes.of[IO] {
       case GET -> Root | GET -> Root / "index.html" =>
         Ok(finalIndex).map(_.withContentType(`Content-Type`(MediaType.text.html)))
     }
+  }
+
+  private def applySubstitutions(fileContents: String): String = {
+    fileContents
+      .replaceAll("""\{\{CALIBRE_PORT\}\}""", calibrePort)
+      .replaceAll("""\{\{CALIBRE_WEB_PORT\}\}""", calibreWebPort)
+      .replaceAll("""\{\{JELLYFIN_PORT\}\}""", jellyfinPort)
+      .replaceAll("""\{\{SERVICE_PORT\}\}""", homeserverPort)
+      .replaceAll("""\{\{HOST\}\}""", homeserverHost)
   }
 
 }
