@@ -16,6 +16,7 @@ import scala.sys.process._
 import scala.util.Success
 import scala.util.Failure
 import scala.util.Try
+import scala.jdk.CollectionConverters._
 
 object HomePortalRoutes {
 
@@ -26,9 +27,10 @@ object HomePortalRoutes {
     import dsl._
     HttpRoutes.of[IO] {
       case request @ GET -> Root / "print" =>
+        val printPath = fs2.io.file.Path(s"$htmlDir/print.html")
         StaticFile
-          .fromResource(s"/$htmlDir/print.html", Some(request))
-          .getOrElseF(NotFound())
+        .fromPath(printPath, Some(request))
+          .getOrElseF(NotFound(this.getClass.getClassLoader.getResources("").asScala.mkString(" SPACE ")))
       case request @ POST -> Root / "print" =>
         EntityDecoder.mixedMultipartResource[IO]().use(decoder =>
           request.decodeWith(decoder, strict = true){ multipart =>
