@@ -21,7 +21,7 @@ object HomePortalRoutes {
 
   def printRoutes(config: Config): HttpRoutes[IO] = {
     val htmlDir = config.getString("app.html-dir")
-    val outputDir = config.getString("app.output-dir")
+    val outputDir = config.getString("app.print.output-dir")
     val dsl = new Http4sDsl[IO]{}
     import dsl._
     HttpRoutes.of[IO] {
