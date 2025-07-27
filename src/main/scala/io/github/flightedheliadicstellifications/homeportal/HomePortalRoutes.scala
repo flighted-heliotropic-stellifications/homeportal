@@ -70,12 +70,14 @@ object HomePortalRoutes {
     val calibreWebPort = config.getString("app.ports.calibre-web")
     val jellyfinPort = config.getString("app.ports.jellyfin")
     val homeserverPort = config.getString("app.ports.homeportal")
+    val homeserverHost = config.getString("app.hosts.homeportal")
 
     val finalIndex = indexTemplate
       .replaceAll("""\{\{CALIBRE_PORT\}\}""", calibrePort)
       .replaceAll("""\{\{CALIBRE_WEB_PORT\}\}""", calibreWebPort)
       .replaceAll("""\{\{JELLYFIN_PORT\}\}""", jellyfinPort)
       .replaceAll("""\{\{SERVICE_PORT\}\}""", homeserverPort)
+      .replaceAll("""\{\{HOST\}\}""", homeserverHost)
 
     HttpRoutes.of[IO] {
       case GET -> Root | GET -> Root / "index.html" =>
