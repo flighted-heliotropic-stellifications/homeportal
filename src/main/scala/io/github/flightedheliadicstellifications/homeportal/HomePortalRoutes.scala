@@ -42,13 +42,14 @@ class HomePortalRoutes(config: Config) {
             val name = multipart.parts.head.filename.getOrElse("misc.pdf")
             val pathString = s"$outputDir/$name"
             val path = file.Path(pathString)
-            multipart.parts.map(_.body).reduce(_ ++ _)
-            .through(Files[IO].writeAll(path))
-            .compile
-            .drain
-            .unsafeRunSync()
 
             Try {
+              multipart.parts.map(_.body).reduce(_ ++ _)
+              .through(Files[IO].writeAll(path))
+              .compile
+              .drain
+              .unsafeRunSync()
+
               val cmd = s"lpr $pathString"
               val output = cmd.!!
               if (output.isEmpty()) {
@@ -62,7 +63,7 @@ class HomePortalRoutes(config: Config) {
             match {
               case Success(x) => x
               case Failure(ex) => 
-                InternalServerError(ex.getMessage()) 
+                InternalServerError(ex.getMessage())
             }
           })
     }

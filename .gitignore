@@ -9,3 +9,4 @@ target
 src/main/resources/ports.conf
 src/main/resources/output
 src/main/resources/hosts.conf
+src/main/resources/print.conf
