@@ -50,7 +50,9 @@ class HomePortalRoutes(config: Config) {
               .drain
               .unsafeRunSync()
 
-              val cmd = s"lpr $pathString"
+              val ubuntuPathString = s"$outputDir/\"$name\""
+
+              val cmd = s"lpr $ubuntuPathString"
               val output = cmd.!!
               if (output.isEmpty()) {
                 val printSuccessTemplate: String = Source.fromResource(s"$htmlDir/print-success.html").mkString
