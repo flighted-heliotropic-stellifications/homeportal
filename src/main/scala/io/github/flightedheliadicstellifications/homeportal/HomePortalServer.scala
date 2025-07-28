@@ -17,14 +17,12 @@ object HomePortalServer {
     val config: Config = ConfigFactory.load()
     val homePortalPort = config.getInt("app.ports.homeportal")
 
-    val cssDir = config.getString("app.css-dir")
-
     val homePortalRoutes = new HomePortalRoutes(config)
 
     val httpApp = (
         homePortalRoutes.indexRoutes <+>
         homePortalRoutes.printRoutes <+>
-        resourceServiceBuilder(s"/$cssDir").toRoutes
+        resourceServiceBuilder("/").toRoutes
       ).orNotFound
 
     val finalHttpApp = Logger.httpApp(true, true)(httpApp)

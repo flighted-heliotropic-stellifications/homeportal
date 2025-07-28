@@ -17,12 +17,17 @@ class RootSpec extends CatsEffectSuite {
     assertIO(retIndex.map(_.status) ,Status.Ok)
   }
 
-  test("index.html has four links") {
+  test("index.html has five links") {
     val messageString = retIndex.flatMap(_.as[String])
     val linkPattern = "<a href".r
     val linkCount = messageString.map(msg => linkPattern.findAllIn(msg).size)
-    assertIO(linkCount, 4)
-    
+    assertIO(linkCount, 5)
+  }
+
+  test("index.html has favicon attribution") {
+    val messageString = retIndex.flatMap(_.as[String])
+    val messageStringContains = messageString.map(msg => msg.contains("""favicon by <a href="https://www.vecteezy.com/free-vector/possum-silhouette">Jannatul Ferdous at Vecteezy</a>"""))
+    assertIO(messageStringContains, true)
   }
 
   private[this] val retIndex: IO[Response[IO]] = {
